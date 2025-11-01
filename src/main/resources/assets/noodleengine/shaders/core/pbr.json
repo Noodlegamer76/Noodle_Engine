@@ -1,0 +1,47 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "srcalpha",
+    "dstrgb": "1-srcalpha"
+  },
+  "vertex": "noodleengine:pbr",
+  "fragment": "noodleengine:pbr",
+  "attributes": [
+    "Position",
+    "Color",
+    "UV0",
+    "NormalUV",
+    "MetallicUV",
+    "RoughnessUV",
+    "AoUV",
+    "EmissiveUV",
+    "Normal",
+    "JointIndices",
+    "JointWeights"
+  ],
+  "samplers": [
+    { "name": "albedoMap" },
+    { "name": "lightTex" },
+    { "name": "normalMap" },
+    { "name": "metallicMap" },
+    { "name": "roughnessMap" },
+    { "name": "aoMap" },
+    { "name": "emissiveMap" },
+    { "name": "depthTex" }
+  ],
+  "uniforms": [
+    { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "projMatInverse", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "modelViewMatInverse", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "metallic", "type": "float", "count": 1, "values": [ 1.0 ] },
+    { "name": "roughness", "type": "float", "count": 1, "values": [ 1.0 ] },
+    { "name": "ao", "type": "float", "count": 1, "values": [ 1.0 ] },
+    { "name": "baseColorFactor", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+    { "name": "emissiveFactor", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+    { "name": "cameraPos", "type": "float", "count": 3, "values": [ 1.0, 1.0, 1.0 ] },
+    { "name": "ScreenSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
+    { "name": "packedLight", "type": "int", "count": 1, "values": [ 1 ] },
+    { "name": "hasAlbedo", "type": "int", "count": 1, "values": [ 1 ] },
+    { "name": "BaseInstance", "type": "int", "count": 1, "values": [ 1 ] }
+  ]
+}
