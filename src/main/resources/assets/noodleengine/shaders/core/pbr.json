@@ -16,8 +16,8 @@
     "AoUV",
     "EmissiveUV",
     "Normal",
-    "JointIndices",
-    "JointWeights"
+    "JointWeights",
+    "JointIndices"
   ],
   "samplers": [
     { "name": "albedoMap" },

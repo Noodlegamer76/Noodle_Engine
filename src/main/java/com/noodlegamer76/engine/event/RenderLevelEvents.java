@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.noodlegamer76.engine.NoodleEngine;
 import com.noodlegamer76.engine.client.renderer.gltf.*;
+import com.noodlegamer76.engine.gltf.animation.skins.SkinSsbo;
 import com.noodlegamer76.engine.gltf.geometry.GltfVbo;
 import com.noodlegamer76.engine.gltf.material.McMaterial;
 import net.minecraft.client.Camera;
@@ -15,7 +16,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Quaternionf;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL43;
 
 import java.util.List;
@@ -30,6 +30,7 @@ public class RenderLevelEvents {
 
         MatrixSsbo matrixManager = GlbRenderer.getMatrixSsbo();
         LightUvSsbo lightUvManager = GlbRenderer.getLightUvSsbo();
+        SkinSsbo skinsManager = GlbRenderer.getSkinSsbo();
 
         MaterialBatch batch = GlbRenderer.getBatch();
 
@@ -42,8 +43,10 @@ public class RenderLevelEvents {
         poseStack.mulPose(new Quaternionf(rotation).conjugate());
         poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
+        //TODO: make a wrapper for ssbos instead of reusing the same code
         GlbRenderer.getMatrixSsbo().upload(poseStack);
         GlbRenderer.getLightUvSsbo().upload();
+        skinsManager.build();
 
         poseStack.popPose();
 
@@ -57,6 +60,8 @@ public class RenderLevelEvents {
 
             GL30.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, matrixManager.getSsboId());
             GL30.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 1, lightUvManager.getSsboId());
+            GL30.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 2, skinsManager.getSkinMatricesId());
+            GL30.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 3, skinsManager.getStartIndicesId());
 
             for (Map.Entry<GltfVbo, List<RenderableBuffer>> vboEntry : vbos.entrySet()) {
 

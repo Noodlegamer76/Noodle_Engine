@@ -1,11 +1,9 @@
 package com.noodlegamer76.engine.gltf.geometry;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.shaders.Uniform;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexBuffer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.noodlegamer76.engine.gltf.material.McMaterial;
 import com.noodlegamer76.engine.mixin.accessor.LightTextureAccessor;
 import com.noodlegamer76.engine.mixin.accessor.VertexBufferAccessor;
@@ -17,10 +15,13 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL31;
 
+import java.util.List;
+
 public class GltfVbo extends VertexBuffer {
     private final McMaterial material;
     private int vertexCount;
     private int indicesCount;
+    private List<Integer> usedJoints;
 
     public GltfVbo(Usage usage, McMaterial material) {
         super(usage);
@@ -130,6 +131,14 @@ public class GltfVbo extends VertexBuffer {
         if (packedLightUniform != null) {
             packedLightUniform.set(packedLight);
         }
+    }
+
+    public void setUsedJoints(List<Integer> usedJoints) {
+        this.usedJoints = usedJoints;
+    }
+
+    public List<Integer> getUsedJoints() {
+        return usedJoints;
     }
 
     public McMaterial getMaterial() {

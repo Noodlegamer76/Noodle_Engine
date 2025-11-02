@@ -9,13 +9,12 @@ import com.noodlegamer76.engine.gltf.material.McMaterial;
 import com.noodlegamer76.engine.mixin.BufferBuilderMixin;
 import de.javagl.jgltf.model.*;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class VBORenderer {
 
@@ -38,27 +37,48 @@ public class VBORenderer {
     }
 
     private static void renderPrimitive(McGltf gltf, BufferBuilder bb, List<MeshPrimitiveModel> primitives, McMaterial material, GltfVbo vbo) {
+        Set<Integer> usedJointSet = new HashSet<>();
+        Map<MeshPrimitiveModel, int[]> primitiveJointsMap = new HashMap<>();
+        Map<MeshPrimitiveModel, float[]> primitiveWeightsMap = new HashMap<>();
+
         for (MeshPrimitiveModel primitive : primitives) {
+            int[] joints = GltfAccessorUtils.getJointIndexArray(primitive.getAttributes().get("JOINTS_0"));
+            float[] weights = GltfAccessorUtils.getFloatArray(primitive.getAttributes().get("WEIGHTS_0"));
+
+            primitiveJointsMap.put(primitive, joints);
+            primitiveWeightsMap.put(primitive, weights);
+
+            if (joints != null && weights != null) {
+                int vertexCount = joints.length / 4;
+                for (int i = 0; i < vertexCount; i++) {
+                    for (int k = 0; k < 4; k++) {
+                        if (weights[i * 4 + k] > 0f) usedJointSet.add(joints[i * 4 + k]);
+                    }
+                }
+            }
+        }
+
+        List<Integer> usedJoints = new ArrayList<>(usedJointSet);
+        Collections.sort(usedJoints);
+        Map<Integer, Integer> jointRemap = new HashMap<>();
+        for (int i = 0; i < usedJoints.size(); i++) jointRemap.put(usedJoints.get(i), i);
+
+        for (MeshPrimitiveModel primitive : primitives) {
+            int[] joints = primitiveJointsMap.get(primitive);
+            float[] weights = primitiveWeightsMap.get(primitive);
+
+            boolean skinned = joints != null && joints.length > 0 && weights != null && weights.length > 0;
+
             int[] indices = GltfAccessorUtils.getIndexArray(primitive.getIndices());
-
-            AccessorModel posAccessor = primitive.getAttributes().get("POSITION");
-            AccessorModel normAccessor = primitive.getAttributes().get("NORMAL");
-            AccessorModel weightsAccessor = primitive.getAttributes().get("WEIGHTS_0");
-            AccessorModel jointsAccessor = primitive.getAttributes().get("JOINTS_0");
-
-            float[] positions = GltfAccessorUtils.getFloatArray(posAccessor);
-            float[] normals = GltfAccessorUtils.getFloatArray(normAccessor);
-            float[] weights = GltfAccessorUtils.getFloatArray(weightsAccessor);
-            int[] joints = GltfAccessorUtils.getJointIndexArray(jointsAccessor);
-
-            vbo.setIndicesCount(indices == null ? 0 : indices.length);
-            vbo.setVertexCount(positions == null ? 0 : positions.length / 3);
+            AccessorModel posAcc = primitive.getAttributes().get("POSITION");
+            AccessorModel normAcc = primitive.getAttributes().get("NORMAL");
+            float[] positions = GltfAccessorUtils.getFloatArray(posAcc);
+            float[] normals = GltfAccessorUtils.getFloatArray(normAcc);
 
             Map<Integer, float[]> uvLayers = new HashMap<>();
             primitive.getAttributes().forEach((name, accessor) -> {
                 if (name.toUpperCase().startsWith("TEXCOORD")) {
-                    String idxStr = name.replaceAll("[^0-9]", "");
-                    int layer = idxStr.isEmpty() ? 0 : Integer.parseInt(idxStr);
+                    int layer = name.replaceAll("[^0-9]", "").isEmpty() ? 0 : Integer.parseInt(name.replaceAll("[^0-9]", ""));
                     float[] uv = GltfAccessorUtils.getFloatArray(accessor);
                     if (uv != null) uvLayers.put(layer, uv);
                 }
@@ -68,18 +88,21 @@ public class VBORenderer {
 
             if (indices != null) {
                 for (int idx : indices) {
-                    if (idx < 0 || idx >= vertexCount) continue;
-                    renderVertex(idx, positions, normals, uvLayers, joints, weights, bb, material);
+                    renderVertex(idx, positions, normals, uvLayers, joints, weights, jointRemap, bb, material);
                 }
             } else {
                 for (int i = 0; i < vertexCount; i++) {
-                    renderVertex(i, positions, normals, uvLayers, joints, weights, bb, material);
+                    renderVertex(i, positions, normals, uvLayers, joints, weights, jointRemap, bb, material);
                 }
             }
         }
+
+        vbo.setUsedJoints(usedJoints);
     }
 
-    private static void renderVertex(int i, float[] pos, float[] norm, Map<Integer, float[]> uvs, int[] joints, float[] weights, BufferBuilder bb, McMaterial mat) {
+    private static void renderVertex(int i, float[] pos, float[] norm, Map<Integer, float[]> uvs,
+                                     int[] rawJoints, float[] rawWeights, Map<Integer, Integer> jointRemap,
+                                     BufferBuilder bb, McMaterial mat) {
         float x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2];
         float nx = (norm != null) ? norm[i * 3] : 0f;
         float ny = (norm != null) ? norm[i * 3 + 1] : 0f;
@@ -90,19 +113,47 @@ public class VBORenderer {
             if (i * 2 + 1 < arr.length) vertexUVs.put(layer, new Vector2f(arr[i * 2], arr[i * 2 + 1]));
         });
 
-        float[] j = new float[4];
-        float[] w = new float[4];
+        int[] joints = new int[4];
+        float[] weights = new float[4];
 
-        if (joints != null) for (int k = 0; k < 4; k++) j[k] = (i * 4 + k < joints.length) ? joints[i * 4 + k] : 0f;
-        if (weights != null) for (int k = 0; k < 4; k++) w[k] = (i * 4 + k < weights.length) ? weights[i * 4 + k] : 0f;
+        boolean hasJoints = rawJoints != null && rawJoints.length > i * 4 + 3;
+        boolean hasWeights = rawWeights != null && rawWeights.length > i * 4 + 3;
 
-        float sum = w[0] + w[1] + w[2] + w[3];
-        if (sum > 0f) for (int k = 0; k < 4; k++) w[k] /= sum;
+        if (hasJoints) {
+            for (int j = 0; j < 4; j++) {
+                joints[j] = rawJoints[i * 4 + j];
+                if (jointRemap != null) joints[j] = jointRemap.getOrDefault((int) joints[j], 0);
+            }
+        } else {
+            Arrays.fill(joints, 0);
+        }
 
-        render(bb, x, y, z, nx, ny, nz, vertexUVs, j, w, mat);
+        if (hasWeights) {
+            for (int j = 0; j < 4; j++) {
+                int idx = i * 4 + j;
+                weights[j] = idx < rawWeights.length ? rawWeights[idx] : 0f;
+            }
+            float sum = weights[0] + weights[1] + weights[2] + weights[3];
+            if (sum > 0f) {
+                for (int j = 0; j < 4; j++) weights[j] /= sum;
+            } else {
+                weights[0] = 1f;
+                weights[1] = weights[2] = weights[3] = 0f;
+            }
+        } else {
+            weights[0] = 1f;
+            weights[1] = weights[2] = weights[3] = 0f;
+        }
+
+        weights[0] = 1;
+        weights[1] = 0;
+        weights[2] = 0;
+        weights[3] = 0;
+
+        render(bb, x, y, z, nx, ny, nz, vertexUVs, joints, weights, mat);
     }
 
-    private static void render(BufferBuilder bb, float x, float y, float z, float nx, float ny, float nz, Map<Integer, Vector2f> vertexUVs, float[] joints, float[] weights, McMaterial mat) {
+    private static void render(BufferBuilder bb, float x, float y, float z, float nx, float ny, float nz, Map<Integer, Vector2f> vertexUVs, int[] joints, float[] weights, McMaterial mat) {
         Vector2f albedo = getUv(vertexUVs, mat, MaterialProperty.ALBEDO_MAP);
         Vector2f normal = getUv(vertexUVs, mat, MaterialProperty.NORMAL_MAP);
         Vector2f metallic = getUv(vertexUVs, mat, MaterialProperty.METALLIC_MAP);
@@ -121,7 +172,7 @@ public class VBORenderer {
         setUv(bb, ModVertexFormat.ELEMENT_AO_UV, ao);
         setUv(bb, ModVertexFormat.ELEMENT_EMISSIVE_UV, emissive);
 
-        setVec4(bb, ModVertexFormat.JOINTS, joints);
+        setIVec4(bb, ModVertexFormat.JOINTS, joints);
         setVec4(bb, ModVertexFormat.WEIGHTS, weights);
     }
 
@@ -130,7 +181,6 @@ public class VBORenderer {
         int idx = mat.getTexCoord((MaterialProperty<ResourceLocation>) prop);
         return uvs.getOrDefault(idx, uvs.getOrDefault(0, new Vector2f(0.5f, 0.5f)));
     }
-
 
     private static void setUv(BufferBuilder bb, VertexFormatElement elem, Vector2f uv) {
         long ptr = ((BufferBuilderMixin) bb).invokeBeginElement(elem);
@@ -144,6 +194,13 @@ public class VBORenderer {
         long ptr = ((BufferBuilderMixin) bb).invokeBeginElement(elem);
         if (ptr != -1L) {
             for (int i = 0; i < 4; i++) MemoryUtil.memPutFloat(ptr + i * 4L, arr[i]);
+        }
+    }
+
+    private static void setIVec4(BufferBuilder bb, VertexFormatElement elem, int[] arr) {
+        long ptr = ((BufferBuilderMixin) bb).invokeBeginElement(elem);
+        if (ptr != -1L) {
+            for (int i = 0; i < 4; i++) MemoryUtil.memPutInt(ptr + i * 4L, arr[i]);
         }
     }
 }

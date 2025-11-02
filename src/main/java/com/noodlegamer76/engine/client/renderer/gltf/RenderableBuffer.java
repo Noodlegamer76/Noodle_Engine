@@ -9,12 +9,14 @@ public class RenderableBuffer {
     private int packedLight;
     private final GltfVbo vertexBuffer;
     private boolean useLevelLight;
+    private final RenderableMesh mesh;
 
-    public RenderableBuffer(Matrix4f modelMatrix, GltfVbo vertexBuffer, int packedLight, boolean useLevelLight) {
+    public RenderableBuffer(Matrix4f modelMatrix, GltfVbo vertexBuffer, RenderableMesh mesh, int packedLight, boolean useLevelLight) {
         this.modelMatrix = modelMatrix;
         this.vertexBuffer = vertexBuffer;
         this.packedLight = packedLight;
         this.useLevelLight = useLevelLight;
+        this.mesh = mesh;
     }
 
     public Matrix4f getModelMatrix() {
@@ -43,5 +45,9 @@ public class RenderableBuffer {
 
     public void setUseLevelLight(boolean useLevelLight) {
         this.useLevelLight = useLevelLight;
+    }
+
+    public RenderableMesh getMesh() {
+        return mesh;
     }
 }

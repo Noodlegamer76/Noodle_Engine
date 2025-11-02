@@ -10,9 +10,11 @@ import javax.annotation.Nullable;
 public class Node {
     private Node parent;
     private Matrix4f modelMatrix;
+    private final NodeModel nodeModel;
 
-    public Node(Matrix4f modelMatrix) {
+    public Node(Matrix4f modelMatrix, NodeModel nodeModel) {
         this.modelMatrix = modelMatrix;
+        this.nodeModel = nodeModel;
     }
 
     public void setParent(Node parent) {
@@ -42,5 +44,9 @@ public class Node {
 
     public Matrix4f getModelMatrix() {
         return modelMatrix;
+    }
+
+    public NodeModel getNodeModel() {
+        return nodeModel;
     }
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 public class LoadMeshes {
     public static void loadMeshes(McGltf gltf) {
         for (MeshModel mesh : gltf.getModel().getMeshModels()) {
-            MeshData meshData = new MeshData(mesh);
+            MeshData meshData = new MeshData(mesh, gltf);
 
             for (MeshPrimitiveModel primitive: mesh.getMeshPrimitiveModels()) {
                 MaterialModel material = primitive.getMaterialModel();

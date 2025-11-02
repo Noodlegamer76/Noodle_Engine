@@ -1,5 +1,4 @@
 #version 430 core
-
 #moj_import <light.glsl>
 
 in vec3 Position;
@@ -11,8 +10,8 @@ in vec2 MetallicUV;
 in vec2 RoughnessUV;
 in vec2 AoUV;
 in vec2 EmissiveUV;
-in vec4 JointIndices;
 in vec4 JointWeights;
+in ivec4 JointIndices;
 
 uniform mat4 ProjMat;
 uniform vec4 baseColorFactor;
@@ -24,6 +23,12 @@ layout(std430, binding = 0) buffer ModelViewBlock {
 };
 layout(std430, binding = 1) buffer LightUvBlock {
     int LightUvData[];
+};
+layout(std430, binding = 2) buffer JointMatBlock {
+    mat4 JointMatrices[];
+};
+layout(std430, binding = 3) buffer JointOffsetBlock {
+    int InstanceOffsets[];
 };
 
 out vec2 texCoord0;
@@ -39,14 +44,28 @@ out vec4 vertexColor;
 out vec4 lightColor;
 
 void main() {
-    mat4 modelView = ModelViewMat[BaseInstance + gl_InstanceID];
+    int instanceIndex = BaseInstance + gl_InstanceID;
+    mat4 modelView = ModelViewMat[instanceIndex];
 
-    int index = (BaseInstance + gl_InstanceID) * 2;
-    //for some reason i have to multiply the uvs by 15 or it doesn't work correctly
-    ivec2 light = ivec2(LightUvData[index] * 15, LightUvData[index + 1] * 15);
+    int lightIndex = instanceIndex * 2;
+    ivec2 light = ivec2(LightUvData[lightIndex] * 15, LightUvData[lightIndex + 1] * 15);
 
-    vec4 pos = vec4(Position, 1.0);
-    gl_Position = ProjMat * modelView * pos;
+    int jointBase = InstanceOffsets[instanceIndex];
+
+    float weightSum = JointWeights.x + JointWeights.y + JointWeights.z + JointWeights.w;
+    int jointSum = JointIndices.x + JointIndices.y + JointIndices.z + JointIndices.w;
+    float uvSum = NormalUV.x + NormalUV.y;
+    float uv0Sum = UV0.x + UV0.y;
+
+        mat4 skinMat;
+        if (weightSum >= -100 || weightSum <= 100) {
+            skinMat = mat4(0.0);
+        } else {
+            skinMat = mat4(1.0);
+        }
+
+  vec4 pos = skinMat * vec4(Position, 1.0);
+  gl_Position = ProjMat * modelView * pos;
 
     texCoord0 = UV0;
     normalCoord = NormalUV;
@@ -57,7 +76,8 @@ void main() {
 
     lightColor = minecraft_sample_lightmap(lightTex, light);
     vertexColor = Color;
-    fragNormal = normalize(Normal);
+
+  fragNormal = normalize(mat3(modelView) * mat3(skinMat) * Normal);
     fragViewPos = (modelView * pos).xyz;
     fragWorldPos = pos.xyz;
 }

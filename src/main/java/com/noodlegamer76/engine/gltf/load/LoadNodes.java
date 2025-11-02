@@ -22,7 +22,7 @@ public class LoadNodes {
             nodeModel.computeGlobalTransform(modelMatrixArr);
             Matrix4f modelMatrix = new Matrix4f().set(modelMatrixArr);
 
-            Node node = new Node(modelMatrix);
+            Node node = new Node(modelMatrix, nodeModel);
 
             gltf.addNodeModelToNode(nodeModel, node);
 

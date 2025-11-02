@@ -6,14 +6,13 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 
 public class ModVertexFormat {
-    public static final VertexFormatElement ELEMENT_NORMAL_UV = new VertexFormatElement(0, 0, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
-    public static final VertexFormatElement ELEMENT_METALLIC_UV = new VertexFormatElement(0, 1, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
-    public static final VertexFormatElement ELEMENT_ROUGHNESS_UV = new VertexFormatElement(0, 2, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
-    public static final VertexFormatElement ELEMENT_AO_UV = new VertexFormatElement(0, 3, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
-    public static final VertexFormatElement ELEMENT_EMISSIVE_UV = new VertexFormatElement(5, 4, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
-    public static final VertexFormatElement JOINTS = new VertexFormatElement(0, 6, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 4);
-    public static final VertexFormatElement WEIGHTS = new VertexFormatElement(0, 7, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 4);
-
+    public static final VertexFormatElement ELEMENT_NORMAL_UV    = VertexFormatElement.register(VertexFormatElement.findNextId(),  3, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
+    public static final VertexFormatElement ELEMENT_METALLIC_UV  = VertexFormatElement.register(VertexFormatElement.findNextId(),  4, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
+    public static final VertexFormatElement ELEMENT_ROUGHNESS_UV = VertexFormatElement.register(VertexFormatElement.findNextId(),  5, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
+    public static final VertexFormatElement ELEMENT_AO_UV        = VertexFormatElement.register(VertexFormatElement.findNextId(),  6, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
+    public static final VertexFormatElement ELEMENT_EMISSIVE_UV  = VertexFormatElement.register(VertexFormatElement.findNextId(), 7, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 2);
+    public static final VertexFormatElement JOINTS               = VertexFormatElement.register(VertexFormatElement.findNextId(), 8, VertexFormatElement.Type.INT,   VertexFormatElement.Usage.UV, 4);
+    public static final VertexFormatElement WEIGHTS              = VertexFormatElement.register(VertexFormatElement.findNextId(), 9, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 4);
 
     public static final VertexFormat GLB_PBR = VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
