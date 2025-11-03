@@ -7,6 +7,7 @@ import com.noodlegamer76.engine.gltf.node.Node;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import de.javagl.jgltf.model.SkinModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class MeshData {
     private final MeshModel meshModel;
     private final McGltf gltf;
     private Node node;
+    private SkinModel skin;
 
     public MeshData(MeshModel meshModel, McGltf gltf) {
         this.meshModel = meshModel;
@@ -62,5 +64,13 @@ public class MeshData {
 
     public McGltf getGltf() {
         return gltf;
+    }
+
+    public SkinModel getSkin() {
+        return skin;
+    }
+
+    public void setSkin(SkinModel skin) {
+        this.skin = skin;
     }
 }

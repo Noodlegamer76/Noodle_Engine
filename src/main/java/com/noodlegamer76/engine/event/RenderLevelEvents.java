@@ -34,6 +34,10 @@ public class RenderLevelEvents {
 
         MaterialBatch batch = GlbRenderer.getBatch();
 
+        for (RenderableMesh mesh: RenderableMeshes.getMeshes()) {
+            mesh.update(event.getPartialTick().getRealtimeDeltaTicks());
+        }
+
         PoseStack poseStack = new PoseStack();
         poseStack.pushPose();
 

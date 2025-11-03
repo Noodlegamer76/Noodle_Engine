@@ -1,11 +1,13 @@
 package com.noodlegamer76.engine.item;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.noodlegamer76.engine.NoodleEngine;
 import com.noodlegamer76.engine.client.renderer.gltf.GlbRenderer;
 import com.noodlegamer76.engine.client.renderer.gltf.RenderableMesh;
 import com.noodlegamer76.engine.client.renderer.gltf.RenderableMeshes;
 import com.noodlegamer76.engine.gltf.McGltf;
+import com.noodlegamer76.engine.gltf.animation.animation.SingleAnimationPlayer;
 import com.noodlegamer76.engine.gltf.geometry.MeshData;
 import com.noodlegamer76.engine.gltf.load.ModelStorage;
 import net.minecraft.client.Minecraft;
@@ -26,27 +28,31 @@ public class TestItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        McGltf model = ModelStorage.getModel(ResourceLocation.fromNamespaceAndPath(NoodleEngine.MODID, "gltf/master.glb"));
+        McGltf model = ModelStorage.getModel(ResourceLocation.fromNamespaceAndPath(NoodleEngine.MODID, "gltf/miku.glb"));
         if (level.isClientSide) {
 
-            Vec3 position = player.position();
+            //Vec3 position = player.position();
             RenderableMeshes.removeAll();
-            //for (int i = 0; i < 400; i++) {
-            //    Vec3 offset = new Vec3((Math.random() - 0.5) * 25, (Math.random() - 0.5) * 25, (Math.random() - 0.5) * 25);
-            //    Vec3 position = new Vec3(player.getX() + offset.x, player.getY() + offset.y, player.getZ() + offset.z);
-            //
-            //}
-            for (MeshData meshData : model.getMeshes()) {
-                PoseStack poseStack = new PoseStack();
-                poseStack.pushPose();
+           //for (int i = 0; i < 100; i++) {
+           //    Vec3 offset = new Vec3((Math.random() - 0.5) * 1, (Math.random() - 0.5) * 1, (Math.random() - 0.5) * 1);
+           //    Vec3 position = new Vec3(player.getX() + offset.x, player.getY() + offset.y, player.getZ() + offset.z);
+           //    for (MeshData meshData : model.getMeshes()) {
+           //        PoseStack poseStack = new PoseStack();
+           //        poseStack.pushPose();
 
-                poseStack.translate(position.x, position.y, position.z);
-                poseStack.scale(1, 1, 1);
+           //        poseStack.translate(position.x, position.y, position.z);
+           //        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+           //        poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
+           //        poseStack.scale(1, 1, 1);
 
-                GlbRenderer.addInstance(meshData, poseStack, -1);
+           //        RenderableMesh mesh = GlbRenderer.addInstance(meshData, poseStack, -1);
 
-                poseStack.popPose();
-            }
+           //        mesh.setAnimationPlayer(new SingleAnimationPlayer(mesh, mesh.getGltf().getAnimations().get("Miku|Miku_Dance")));
+
+           //        poseStack.popPose();
+           //    }
+           //}
+
 
         }
 

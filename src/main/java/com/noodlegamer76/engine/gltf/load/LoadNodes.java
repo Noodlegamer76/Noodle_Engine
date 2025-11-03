@@ -18,11 +18,15 @@ public class LoadNodes {
 
             meshes.forEach((meshModel -> meshData.add(gltf.getMeshModelToMeshData().get(meshModel))));
 
-            float[] modelMatrixArr = new float[16];
-            nodeModel.computeGlobalTransform(modelMatrixArr);
-            Matrix4f modelMatrix = new Matrix4f().set(modelMatrixArr);
+            float[] globalArr = new float[16];
+            nodeModel.computeGlobalTransform(globalArr);
+            Matrix4f global = new Matrix4f().set(globalArr);
 
-            Node node = new Node(modelMatrix, nodeModel);
+            float[] localArr = new float[16];
+            nodeModel.computeLocalTransform(localArr);
+            Matrix4f local = new Matrix4f().set(localArr);
+
+            Node node = new Node(global, local, nodeModel);
 
             gltf.addNodeModelToNode(nodeModel, node);
 

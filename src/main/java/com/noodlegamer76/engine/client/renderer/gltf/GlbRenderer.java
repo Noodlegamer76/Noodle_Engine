@@ -31,18 +31,20 @@ public class GlbRenderer {
     /*
     make packedLight '-1' to match world light
      */
-    public static void addInstance(MeshData meshData, PoseStack poseStack, int packedLight) {
+    public static RenderableMesh addInstance(MeshData meshData, PoseStack poseStack, int packedLight) {
         Node node = meshData.getNode();
         RenderableMesh renderableMesh = new RenderableMesh(meshData);
-        Matrix4f modelMatrix = new Matrix4f(poseStack.last().pose()).mul(node.getModelMatrix());
+        Matrix4f modelMatrix = new Matrix4f(poseStack.last().pose());
         for (Map.Entry<McMaterial, GltfVbo> buffers: meshData.getPrimitiveBuffers().entrySet()) {
             RenderableBuffer renderableBuffer = new RenderableBuffer(modelMatrix, buffers.getValue(), renderableMesh, packedLight, packedLight == -1);
             addBuffer(buffers.getKey(), renderableBuffer);
             renderableMesh.addBuffer(renderableBuffer);
         }
-        renderableMesh.buildUsedJoints();
+        renderableMesh.buildJoints();
         renderableMesh.setModelMatrix(modelMatrix);
         RenderableMeshes.addMesh(renderableMesh);
+
+        return renderableMesh;
     }
 
     public static MatrixSsbo getMatrixSsbo() {

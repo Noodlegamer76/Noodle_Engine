@@ -145,11 +145,6 @@ public class VBORenderer {
             weights[1] = weights[2] = weights[3] = 0f;
         }
 
-        weights[0] = 1;
-        weights[1] = 0;
-        weights[2] = 0;
-        weights[3] = 0;
-
         render(bb, x, y, z, nx, ny, nz, vertexUVs, joints, weights, mat);
     }
 

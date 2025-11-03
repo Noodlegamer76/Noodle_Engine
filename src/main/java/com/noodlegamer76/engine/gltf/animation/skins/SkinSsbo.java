@@ -45,14 +45,14 @@ public class SkinSsbo {
 
         Map<RenderableMesh, Integer> meshStarts = new HashMap<>();
 
-        Matrix4f identity = new Matrix4f();
+        Matrix4f identity = new Matrix4f().transpose();
         float[] test = new float[16];
         identity.get(test);
         skinMatrices.put(test);
         int matrixOffset = 1;
 
         for (RenderableMesh mesh : meshes) {
-            List<Integer> usedJoints = mesh.getUsedJoints();
+            List<Integer> usedJoints = mesh.getJoints();
             if (usedJoints == null || usedJoints.isEmpty()) continue;
 
             meshStarts.put(mesh, matrixOffset);
@@ -79,7 +79,7 @@ public class SkinSsbo {
         List<RenderableBuffer> buffers = GlbRenderer.getMatrixSsbo().getBuffers();
         for (RenderableBuffer buffer : buffers) {
             RenderableMesh mesh = buffer.getMesh();
-            List<Integer> usedJoints = mesh.getUsedJoints();
+            List<Integer> usedJoints = mesh.getJoints();
 
             if (usedJoints == null || usedJoints.isEmpty()) {
                 startIndices.put(0);

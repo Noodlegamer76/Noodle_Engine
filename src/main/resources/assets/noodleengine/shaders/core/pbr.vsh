@@ -57,12 +57,10 @@ void main() {
     float uvSum = NormalUV.x + NormalUV.y;
     float uv0Sum = UV0.x + UV0.y;
 
-        mat4 skinMat;
-        if (weightSum >= -100 || weightSum <= 100) {
-            skinMat = mat4(0.0);
-        } else {
-            skinMat = mat4(1.0);
-        }
+     mat4 skinMat = JointWeights.x * JointMatrices[jointBase + JointIndices.x];
+     skinMat += JointWeights.y * JointMatrices[jointBase + JointIndices.y];
+     skinMat += JointWeights.z * JointMatrices[jointBase + JointIndices.z];
+     skinMat += JointWeights.w * JointMatrices[jointBase + JointIndices.w];
 
   vec4 pos = skinMat * vec4(Position, 1.0);
   gl_Position = ProjMat * modelView * pos;
@@ -77,7 +75,7 @@ void main() {
     lightColor = minecraft_sample_lightmap(lightTex, light);
     vertexColor = Color;
 
-  fragNormal = normalize(mat3(modelView) * mat3(skinMat) * Normal);
+  fragNormal = normalize(mat3(skinMat) * Normal);
     fragViewPos = (modelView * pos).xyz;
     fragWorldPos = pos.xyz;
 }
