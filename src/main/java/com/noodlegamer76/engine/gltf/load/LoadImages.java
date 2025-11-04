@@ -48,7 +48,7 @@ public class LoadImages {
 
                 DynamicTexture dynamicTexture = new DynamicTexture(image);
                 TextureManager manager = Minecraft.getInstance().getTextureManager();
-                ResourceLocation location = gltf.getLocation().withSuffix("/" + name);
+                ResourceLocation location = gltf.getLocation().withSuffix("/" + i);
                 manager.register(location, dynamicTexture);
 
                 imageData.addTexture(dynamicTexture);

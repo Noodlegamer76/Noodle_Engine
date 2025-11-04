@@ -53,7 +53,13 @@ public class MatrixSsbo {
 
                 for (RenderableBuffer renderableBuffer : renderableBuffers) {
                     if (matrices.size() >= MAX_MATRICES) break;
-                    Matrix4f modelView = new Matrix4f(view).mul(renderableBuffer.getModelMatrix());
+                    Matrix4f modelView;
+                    if (renderableBuffer.getMesh().getMeshData().getSkin() != null) {
+                        modelView = new Matrix4f(view).mul(renderableBuffer.getSkinnedModelMatrix());
+                    }
+                    else {
+                        modelView = new Matrix4f(view).mul(renderableBuffer.getModelMatrix());
+                    }
                     matrices.add(modelView);
                     bufferToMatrix.put(renderableBuffer, modelView);
                     this.buffers.add(renderableBuffer);

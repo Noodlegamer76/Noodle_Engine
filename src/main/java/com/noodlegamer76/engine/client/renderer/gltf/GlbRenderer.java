@@ -34,9 +34,10 @@ public class GlbRenderer {
     public static RenderableMesh addInstance(MeshData meshData, PoseStack poseStack, int packedLight) {
         Node node = meshData.getNode();
         RenderableMesh renderableMesh = new RenderableMesh(meshData);
-        Matrix4f modelMatrix = new Matrix4f(poseStack.last().pose());
+        Matrix4f skinnedModelMatrix = new Matrix4f(poseStack.last().pose());
+        Matrix4f modelMatrix = new Matrix4f(poseStack.last().pose()).mul(node.getGlobal());
         for (Map.Entry<McMaterial, GltfVbo> buffers: meshData.getPrimitiveBuffers().entrySet()) {
-            RenderableBuffer renderableBuffer = new RenderableBuffer(modelMatrix, buffers.getValue(), renderableMesh, packedLight, packedLight == -1);
+            RenderableBuffer renderableBuffer = new RenderableBuffer(skinnedModelMatrix, modelMatrix, buffers.getValue(), renderableMesh, packedLight, packedLight == -1);
             addBuffer(buffers.getKey(), renderableBuffer);
             renderableMesh.addBuffer(renderableBuffer);
         }

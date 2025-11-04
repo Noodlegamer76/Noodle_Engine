@@ -1,14 +1,11 @@
 package com.noodlegamer76.engine.client.renderer.gltf;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.noodlegamer76.engine.gltf.geometry.GltfVbo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -16,7 +13,6 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL43;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.*;
 
@@ -51,7 +47,7 @@ public class LightUvSsbo {
             int block;
             int sky;
             if (buffer.isUseLevelLight()) {
-                Vector3f translation = getTranslation(buffer.getModelMatrix());
+                Vector3f translation = getTranslation(buffer.getSkinnedModelMatrix());
                 block = level.getBrightness(LightLayer.BLOCK, BlockPos.containing(translation.x, translation.y, translation.z));
                 sky = level.getBrightness(LightLayer.SKY, BlockPos.containing(translation.x, translation.y, translation.z));
             }

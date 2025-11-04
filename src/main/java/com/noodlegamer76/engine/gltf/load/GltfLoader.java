@@ -17,6 +17,7 @@ public class GltfLoader {
 
     public static void loadAllGlbModels(ResourceManager resourceManager, String folder) {
         Map<ResourceLocation, Resource> locations = resourceManager.listResources(folder, path -> path.toString().endsWith(".glb"));
+        locations.putAll(resourceManager.listResources(folder, path -> path.toString().endsWith(".gltf")));
         for (Map.Entry<ResourceLocation, Resource> resource : locations.entrySet()) {
             loadModel(resource, resourceManager);
         }

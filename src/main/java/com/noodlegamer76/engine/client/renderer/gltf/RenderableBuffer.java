@@ -1,17 +1,19 @@
 package com.noodlegamer76.engine.client.renderer.gltf;
 
-import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.noodlegamer76.engine.gltf.geometry.GltfVbo;
 import org.joml.Matrix4f;
 
 public class RenderableBuffer {
+    //skinned model matrix will later be multiplied with the animation globals
+    private Matrix4f skinnedModelMatrix;
     private Matrix4f modelMatrix;
     private int packedLight;
     private final GltfVbo vertexBuffer;
     private boolean useLevelLight;
     private final RenderableMesh mesh;
 
-    public RenderableBuffer(Matrix4f modelMatrix, GltfVbo vertexBuffer, RenderableMesh mesh, int packedLight, boolean useLevelLight) {
+    public RenderableBuffer(Matrix4f skinnedModelMatrix, Matrix4f modelMatrix, GltfVbo vertexBuffer, RenderableMesh mesh, int packedLight, boolean useLevelLight) {
+        this.skinnedModelMatrix = skinnedModelMatrix;
         this.modelMatrix = modelMatrix;
         this.vertexBuffer = vertexBuffer;
         this.packedLight = packedLight;
@@ -19,8 +21,8 @@ public class RenderableBuffer {
         this.mesh = mesh;
     }
 
-    public Matrix4f getModelMatrix() {
-        return modelMatrix;
+    public Matrix4f getSkinnedModelMatrix() {
+        return skinnedModelMatrix;
     }
 
     public GltfVbo getVertexBuffer() {
@@ -31,8 +33,8 @@ public class RenderableBuffer {
         return packedLight;
     }
 
-    public void setModelMatrix(Matrix4f modelMatrix) {
-        this.modelMatrix = modelMatrix;
+    public void setSkinnedModelMatrix(Matrix4f skinnedModelMatrix) {
+        this.skinnedModelMatrix = skinnedModelMatrix;
     }
 
     public void setPackedLight(int packedLight) {
@@ -49,5 +51,13 @@ public class RenderableBuffer {
 
     public RenderableMesh getMesh() {
         return mesh;
+    }
+
+    public Matrix4f getModelMatrix() {
+        return modelMatrix;
+    }
+
+    public void setModelMatrix(Matrix4f modelMatrix) {
+        this.modelMatrix = modelMatrix;
     }
 }

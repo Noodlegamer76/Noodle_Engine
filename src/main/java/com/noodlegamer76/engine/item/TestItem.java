@@ -28,30 +28,33 @@ public class TestItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        McGltf model = ModelStorage.getModel(ResourceLocation.fromNamespaceAndPath(NoodleEngine.MODID, "gltf/miku.glb"));
+        McGltf model = ModelStorage.getModel(ResourceLocation.fromNamespaceAndPath(NoodleEngine.MODID, "gltf/master.glb"));
         if (level.isClientSide) {
 
-            //Vec3 position = player.position();
-            RenderableMeshes.removeAll();
-           //for (int i = 0; i < 100; i++) {
+            Vec3 position = player.position();
+            //RenderableMeshes.removeAll();
+           //for (int i = 0; i < 1; i++) {
            //    Vec3 offset = new Vec3((Math.random() - 0.5) * 1, (Math.random() - 0.5) * 1, (Math.random() - 0.5) * 1);
            //    Vec3 position = new Vec3(player.getX() + offset.x, player.getY() + offset.y, player.getZ() + offset.z);
            //    for (MeshData meshData : model.getMeshes()) {
-           //        PoseStack poseStack = new PoseStack();
-           //        poseStack.pushPose();
-
-           //        poseStack.translate(position.x, position.y, position.z);
-           //        poseStack.mulPose(Axis.XP.rotationDegrees(90));
-           //        poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
-           //        poseStack.scale(1, 1, 1);
-
-           //        RenderableMesh mesh = GlbRenderer.addInstance(meshData, poseStack, -1);
-
-           //        mesh.setAnimationPlayer(new SingleAnimationPlayer(mesh, mesh.getGltf().getAnimations().get("Miku|Miku_Dance")));
-
-           //        poseStack.popPose();
+           //
            //    }
            //}
+            PoseStack poseStack = new PoseStack();
+            poseStack.pushPose();
+
+            poseStack.translate(position.x, position.y, position.z);
+            poseStack.mulPose(Axis.XP.rotationDegrees(90));
+            poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
+            poseStack.scale(1, 1, 1);
+
+            for (MeshData meshData : model.getMeshes()) {
+                RenderableMesh mesh = GlbRenderer.addInstance(meshData, poseStack, -1);
+
+                //mesh.setAnimationPlayer(new SingleAnimationPlayer(mesh, mesh.getGltf().getAnimations().entrySet().iterator().next().getValue()));
+            }
+
+            poseStack.popPose();
 
 
         }
