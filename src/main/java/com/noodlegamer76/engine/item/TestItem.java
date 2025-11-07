@@ -6,6 +6,9 @@ import com.noodlegamer76.engine.NoodleEngine;
 import com.noodlegamer76.engine.client.renderer.gltf.GlbRenderer;
 import com.noodlegamer76.engine.client.renderer.gltf.RenderableMesh;
 import com.noodlegamer76.engine.client.renderer.gltf.RenderableMeshes;
+import com.noodlegamer76.engine.core.component.GltfModelComponent;
+import com.noodlegamer76.engine.entity.GameObject;
+import com.noodlegamer76.engine.entity.InitEntities;
 import com.noodlegamer76.engine.gltf.McGltf;
 import com.noodlegamer76.engine.gltf.animation.animation.SingleAnimationPlayer;
 import com.noodlegamer76.engine.gltf.geometry.MeshData;
@@ -20,6 +23,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 public class TestItem extends Item {
     public TestItem(Properties properties) {
@@ -28,7 +32,7 @@ public class TestItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        McGltf model = ModelStorage.getModel(ResourceLocation.fromNamespaceAndPath(NoodleEngine.MODID, "gltf/master.glb"));
+        McGltf model = ModelStorage.getModel(ResourceLocation.fromNamespaceAndPath(NoodleEngine.MODID, "gltf/truck.glb"));
         if (level.isClientSide) {
 
             Vec3 position = player.position();
@@ -40,23 +44,35 @@ public class TestItem extends Item {
            //
            //    }
            //}
-            PoseStack poseStack = new PoseStack();
-            poseStack.pushPose();
+            //PoseStack poseStack = new PoseStack();
+            //poseStack.pushPose();
+//
+            //poseStack.translate(position.x, position.y, position.z);
+            //poseStack.mulPose(Axis.XP.rotationDegrees(90));
+            //poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
+            //poseStack.scale(1, 1, 1);
+//
+            //for (MeshData meshData : model.getMeshes()) {
+            //    RenderableMesh mesh = GlbRenderer.addInstance(meshData, poseStack, -1);
+//
+            //    //mesh.setAnimationPlayer(new SingleAnimationPlayer(mesh, mesh.getGltf().getAnimations().entrySet().iterator().next().getValue()));
+            //}
+//
+            //poseStack.popPose();
 
-            poseStack.translate(position.x, position.y, position.z);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
-            poseStack.scale(1, 1, 1);
 
-            for (MeshData meshData : model.getMeshes()) {
-                RenderableMesh mesh = GlbRenderer.addInstance(meshData, poseStack, -1);
+        }
 
-                //mesh.setAnimationPlayer(new SingleAnimationPlayer(mesh, mesh.getGltf().getAnimations().entrySet().iterator().next().getValue()));
-            }
+        if (!level.isClientSide) {
+            GameObject gameObject = new GameObject(InitEntities.GAME_OBJECT.get(), level);
 
-            poseStack.popPose();
+            level.addFreshEntity(gameObject);
 
+            gameObject.setScale(new Vector3f(100, 100, 100));
 
+            GltfModelComponent component = new GltfModelComponent(gameObject, ResourceLocation.fromNamespaceAndPath(NoodleEngine.MODID, "gltf/truck.glb"));
+            gameObject.addComponent(component);
+            gameObject.setPos(player.getX(), player.getY(), player.getZ());
         }
 
         return super.use(level, player, usedHand);

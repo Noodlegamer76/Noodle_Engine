@@ -2,6 +2,8 @@ package com.noodlegamer76.engine;
 
 import com.mojang.logging.LogUtils;
 import com.noodlegamer76.engine.block.InitBlocks;
+import com.noodlegamer76.engine.core.component.InitComponents;
+import com.noodlegamer76.engine.entity.InitEntities;
 import com.noodlegamer76.engine.item.InitItems;
 import com.noodlegamer76.engine.tile.InitBlockEntities;
 import com.noodlegamer76.engine.worldgen.feature.InitFeatures;
@@ -22,6 +24,8 @@ public class NoodleEngine {
         InitFeatures.FEATURES.register(modEventBus);
         InitBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         InitBlocks.BLOCKS.register(modEventBus);
+        InitComponents.COMPONENT_TYPES.register(modEventBus);
+        InitEntities.ENTITY_TYPES.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
